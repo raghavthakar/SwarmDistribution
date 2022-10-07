@@ -2,9 +2,16 @@
 allocates task requirements to each task
 and has methods to compute the distribution etc'''
 import numpy as np
+import swarm
 
 class TaskGraph():
-    def __init__(self, T, S):
+    # num_tasks
+    # num_traits
+    # K
+    # Xt
+    # Yt
+
+    def __init__(self, T, S, K):
         self.num_tasks, self.num_traits = T.shape
         
         # declare the transition probability matrix
