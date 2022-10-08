@@ -44,7 +44,11 @@ class Swarm():
                 # choose a transition out from that task based on K
                 task_transition_vector = K[specie][alloted_task]
                 transitioned_task = random.choices(self.task_ids, weights=task_transition_vector)
-                self.P[specie][agent] = transitioned_task
+                self.P[specie][agent] = transitioned_task[0]
+    
+    # return the P matrix
+    def getP(self):
+        return self.P
     
     def display(self):
         print("Alloted Target matrix P: \n", self.P)

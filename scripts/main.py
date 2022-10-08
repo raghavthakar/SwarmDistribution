@@ -37,7 +37,7 @@ K = np.array([[[0, 0.33, 0.33, 0.33], [0.33, 0, 0.33, 0.33], [0.33, 0.33, 0, 0.3
               [[0, 0.33, 0.33, 0.33], [0.33, 0, 0.33, 0.33], [0.33, 0.33, 0, 0.33], [0.33, 0.33, 0.33, 0]],
               [[0, 0.33, 0.33, 0.33], [0.33, 0, 0.33, 0.33], [0.33, 0.33, 0, 0.33], [0.33, 0.33, 0.33, 0]]])
 
-tg = taskgraph.TaskGraph(T, S, K)
+tg = taskgraph.TaskGraph(T, S, K, task_ids)
 
 # manually initialise the t=0 distribution of agents
 # among the tasks. Columns are species, rows are tasks,
@@ -56,5 +56,9 @@ tg.display()
 
 # execute one transition iteration and store new allocations
 main_swarm.computeAndAssignTransitions(K)
-
 main_swarm.display()
+
+tg.updateAgentDistribution(main_swarm.getP())
+# manually compute the distribution of traits across tasks
+tg.computeTraitDistribution(Q)
+tg.display()
