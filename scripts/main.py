@@ -9,7 +9,7 @@ Q = np.array([[1, 0, 1, 0],
               [1, 1, 0, 1]])
 
 # S vector stores the number of agents of each specie in the system
-S = np.array([10, 6, 12])
+S = np.array([12, 12, 12])
 
 # assigns an ID to each task (use 0, 1, 2.. for easy indexing)
 task_ids = [0, 1, 2, 3]
@@ -54,11 +54,12 @@ tg.computeTraitDistribution(Q)
 main_swarm.display()
 tg.display()
 
-# execute one transition iteration and store new allocations
-main_swarm.computeAndAssignTransitions(K)
-main_swarm.display()
+for i in range(6000):
+    # execute one transition iteration and store new allocations
+    main_swarm.computeAndAssignTransitions(K)
+    main_swarm.display()
 
-tg.updateAgentDistribution(main_swarm.getP())
-# manually compute the distribution of traits across tasks
-tg.computeTraitDistribution(Q)
-tg.display()
+    tg.updateAgentDistribution(main_swarm.getP())
+    # manually compute the distribution of traits across tasks
+    tg.computeTraitDistribution(Q)
+    tg.display()

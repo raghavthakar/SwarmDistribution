@@ -16,12 +16,7 @@ class TaskGraph():
         self.num_tasks, self.num_traits = T.shape
         
         # declare the transition probability matrix
-        self.K = np.zeros((self.num_tasks, self.num_tasks))
-        # initialise K with equal transition probabilities to every other task
-        for i in range(self.num_tasks):
-            for j in range(self.num_tasks):
-                if i != j:
-                    self.K[i, j] = 1/self.num_tasks
+        self.K = K
         
         self.task_ids = task_ids
         
