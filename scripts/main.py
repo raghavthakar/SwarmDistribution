@@ -11,8 +11,11 @@ Q = np.array([[1, 0, 1, 0],
 # S vector stores the number of agents of each specie in the system
 S = np.array([10, 6, 12])
 
+# assigns an ID to each task (use 0, 1, 2.. for easy indexing)
+task_ids = [0, 1, 2, 3]
+
 # intiialise a swarm
-main_swarm = swarm.Swarm(Q, S)
+main_swarm = swarm.Swarm(Q, S, task_ids)
 
 # T matrix stores the trait requirements of each task
 # each row has the required traits for a task
@@ -25,7 +28,7 @@ T = np.array([[5, 2, 6, 4],
 D = np.array([[0, 0, 0],
               [0, 0, 0],
               [0, 0, 0],
-               S])
+              S])
 
 # K matrix stores the transition probabilities between tasks
 # it is like a TPM
@@ -50,3 +53,8 @@ tg.computeTraitDistribution(Q)
 
 main_swarm.display()
 tg.display()
+
+# execute one transition iteration and store new allocations
+main_swarm.computeAndAssignTransitions(K)
+
+main_swarm.display()
