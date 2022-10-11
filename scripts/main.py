@@ -1,3 +1,4 @@
+from audioop import avg
 import numpy as np
 import taskgraph
 import swarm
@@ -5,7 +6,7 @@ import swarm
 # Q matrix stores the traits of each specie
 # each row has the traits for a specie
 Q = np.array([[1, 0, 1, 0],
-              [0, 1, 1, 1],
+              [1, 1, 1, 1],
               [1, 1, 0, 1]])
 
 # S vector stores the number of agents of each specie in the system
@@ -54,7 +55,8 @@ tg.computeTraitDistribution(Q)
 main_swarm.display()
 tg.display()
 
-for i in range(6000):
+num_iters = 500
+for i in range(num_iters):
     # execute one transition iteration and store new allocations
     main_swarm.computeAndAssignTransitions(K)
     main_swarm.display()
@@ -62,4 +64,9 @@ for i in range(6000):
     tg.updateAgentDistribution(main_swarm.getP())
     # manually compute the distribution of traits across tasks
     tg.computeTraitDistribution(Q)
+    # update the cumulative agent and trait distribution across the tasks
+    tg.updateCumulativeDistributions()
     tg.display()
+
+print("Average agent distribution: \n", np.divide(tg.getCumulativeAgentDistribution(), num_iters))
+print("Average agent distribution: \n", np.divide(tg.getCumulativeTraitDistribution(), num_iters))
