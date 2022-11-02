@@ -99,19 +99,15 @@ def LinearOptimiser(Q, S, task_ids, T, D, K):
             constraints3[-1].SetCoefficient(T_bar[i][j], 1)
     # [END CONSTRAINTS]-----------
 
-    # [START OBJECTIVE]-----------
-    # keep a constant objective to not optimise anything
-    # objective = solver.Objective()
-    # objective.SetCoefficient(5, 1)
-    # objective.SetMinimization()
-
-    # [END OBJECTIVE]-----------
-
     solver.Solve()
+    agent_distribution = []
     for i in range(len(X)):
+        temp_row = []
         for j in range(len(X[0])):
-            print(str(X[i][j].solution_value())+" ", end="")
-        print()
+            temp_row.append(int(X[i][j].solution_value()))
+        agent_distribution.append(temp_row)
+    
+    return agent_distribution
 
 # Q matrix stores the traits of each specie
 # each row has the traits for a specie
@@ -120,7 +116,7 @@ Q = np.array([[1, 0, 1, 0],
               [1, 1, 0, 1]])
 
 # S vector stores the number of agents of each specie in the system
-S = np.array([7, 7, 7])
+S = np.array([5, 8, 7])
 
 # assigns an ID to each task (use 0, 1, 2.. for easy indexing)
 task_ids = [0, 1, 2, 3]
@@ -146,4 +142,8 @@ K = np.array([[[0, 0.33, 0.33, 0.33], [0.33, 0, 0.33, 0.33], [0.33, 0.33, 0, 0.3
               [[0, 0.33, 0.33, 0.33], [0.33, 0, 0.33, 0.33], [0.33, 0.33, 0, 0.33], [0.33, 0.33, 0.33, 0]]])
 
 # simulation(Q, S, task_ids, T, D, K)
-LinearOptimiser(Q, S, task_ids, T, D, K)
+X = LinearOptimiser(Q, S, task_ids, T, D, K)
+print("Agent distribution: ", X)
+
+T_bar = np.matmul(np.array(X), np.array(Q))
+print("Trait distribution: ", T_bar)
