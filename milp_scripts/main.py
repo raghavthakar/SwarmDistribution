@@ -109,6 +109,26 @@ def LinearOptimiser(Q, S, task_ids, T, D, K):
     
     return agent_distribution
 
+# Find the TPM from knowledge of Pi
+def TPMOptimisation(X_dens, Q, S, task_ids, T, D, K):
+
+    # X_dens is the steady state probabilities
+    P = []
+    for i in range(len(Q)): #through the species
+        temp_matrix = []
+        for j in range(len(task_ids)):
+            temp_matrix.append(X_dens[i])
+        P.append(temp_matrix)
+    
+    for i in range(len(P)):
+        for j in range(len(P[0])):
+            for k in range(len(P[0][0])):
+                print(P[i][j][k], end=" ")
+            print()
+        print()
+    
+    return P
+
 # Q matrix stores the traits of each specie
 # each row has the traits for a specie
 Q = np.array([[1, 0, 1, 0],
@@ -142,8 +162,108 @@ K = np.array([[[0, 0.33, 0.33, 0.33], [0.33, 0, 0.33, 0.33], [0.33, 0.33, 0, 0.3
               [[0, 0.33, 0.33, 0.33], [0.33, 0, 0.33, 0.33], [0.33, 0.33, 0, 0.33], [0.33, 0.33, 0.33, 0]]])
 
 # simulation(Q, S, task_ids, T, D, K)
+
+# X stores the distribution of agents across the tasks
 X = LinearOptimiser(Q, S, task_ids, T, D, K)
 print("Agent distribution: ", X)
 
 T_bar = np.matmul(np.array(X), np.array(Q))
-print("Trait distribution: ", T_bar)
+print("Trait distribution: ")
+print(T_bar)
+
+# X_dens stores the fraction of a specie at a task (specie vs task)
+X_dens = X.copy()
+for i in range(len(X)):
+    for j in range(len(X[0])):
+        X_dens[i][j] = X_dens[i][j]/S[j]
+X_dens = np.matrix.transpose(np.array(X_dens))
+print("Agent density: ")
+print(X_dens)
+
+P = TPMOptimisation(X_dens, Q, S, task_ids, T, D, K)
+
+simulation(Q, S, task_ids, T, D, P)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # [START VARIABLES]-----------
+#     # 1. Create a P_bar[i] matrix that is product of I-P[i] and X_dens[i]
+#     P_bar = []
+#     for i in range(len(Q)): #through the species
+#         temp_matrix = []
+#         for j in range(len(task_ids)):
+#             temp_row = []
+#             for k in range(len(task_ids)):
+#                 temp_row.append((solver.NumVar(0, 1, "Pbar_"+str(i)+'_'+str(j)+'_'+str(k))))
+#             temp_matrix.append(temp_row)
+#         P_bar.append(temp_matrix)
+    
+#     print("P_bar: ", P_bar)
+
+#     # 2. Create a P[i] matrix
+#     P = []
+#     for i in range(len(Q)): #through the species
+#         temp_matrix = []
+#         for j in range(len(task_ids)):
+#             temp_row = []
+#             for k in range(len(task_ids)):
+#                 temp_row.append((solver.NumVar(0, 1, 'P_'+str(i)+'_'+str(j)+'_'+str(k))))
+#             temp_matrix.append(temp_row)
+#         P.append(temp_matrix)
+    
+#     print("P: ", P)
+#     # [END VARIABLES]-----------
+
+#     # [START CONSTRAINTS]-----------
+#     # 1. Pi[j] P_bar[j][k] = 0
+#     constraints1=[]
+#     for i in range(len(P_bar)): #through the species
+#         for j in range(len(P_bar[0])):
+#             constraints1.append(solver.Constraint(-solver.infinity(), solver.infinity()))
+#             for k in range(len(P_bar[0][0])):
+#                 constraints1[-1].SetCoefficient(P_bar[i][k][j], X_dens[i][k])
+
+#     # 2. P'[i] = I-P[i]
+#     constraints2=[]
+#     for i in range(len(P_bar)):
+#         for j in range(len(P_bar[0])):
+#             for k in range(len(P_bar[0][0])):
+#                 constraints2.append(solver.Constraint(float(I[j][k]), float(I[j][k])))
+#                 constraints2[-1].SetCoefficient(P_bar[i][j][k], 1)
+#                 constraints2[-1].SetCoefficient(P[i][j][k], 1)
+    
+#     # 3. Row sum of P = 1
+#     constraints3=[]
+#     for i in range(len(P)):
+#         for j in range(len(P[0])): #down the column
+#             constraints3.append(solver.Constraint(1, 1))
+#             for k in range(len(P[0][0])):
+#                 constraints3[-1].SetCoefficient(P[i][j][k], 1)
+    
+#     # 4. diagonal elements in the TPM must be zero (no self loop)
+#     # constraints4=[]
+#     # for i in range(len(P)):
+#     #     for j in range(len(P[0])):
+#     #         constraints4.append(solver.Constraint(0, 0))
+#     #         constraints4[-1].SetCoefficient(P[i][j][j], 1)
+#     # [END CONSTRAINTS]-----------
+
+#     solver.Solve()
+#     for i in range(len(P)):
+#         for j in range(len(P[0])):
+#             for k in range(len(P[0][0])):
+#                 print(P[i][j][k].solution_value(), end=" ")
+#             print()
+#         print()
