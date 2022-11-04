@@ -24,7 +24,7 @@ def simulation(Q, S, task_ids, T, D, K):
     main_swarm.display()
     tg.display()
 
-    num_iters = 250
+    num_iters = 750
     for i in range(num_iters):
         # execute one transition iteration and store new allocations
         main_swarm.computeAndAssignTransitions(K)
@@ -41,7 +41,7 @@ def simulation(Q, S, task_ids, T, D, K):
     print("Average trait distribution: \n", np.divide(tg.getCumulativeTraitDistribution(), num_iters))
 
 # all the linear optimsiation stuff to find feasible linear combinations
-def LinearOptimiser(Q, S, task_ids, T, D, K):
+def LinearOptimiser(Q, S, task_ids, T):
 
     # instantiate a linear solver
     solver = pywraplp.Solver.CreateSolver('SCIP')
@@ -110,7 +110,7 @@ def LinearOptimiser(Q, S, task_ids, T, D, K):
     return agent_distribution
 
 # Find the TPM from knowledge of Pi
-def TPMOptimisation(X_dens, Q, S, task_ids, T, D, K):
+def TPMOptimisation(X_dens, Q, S, task_ids):
 
     # X_dens is the steady state probabilities
     P = []
@@ -154,17 +154,8 @@ D = np.array([[0, 0, 0],
               [0, 0, 0],
               S])
 
-# K matrix stores the transition probabilities between tasks
-# it is like a TPM
-# for speicies 1, 2, 3 we have a 3d matrix:
-K = np.array([[[0, 0.33, 0.33, 0.33], [0.33, 0, 0.33, 0.33], [0.33, 0.33, 0, 0.33], [0.33, 0.33, 0.33, 0]],
-              [[0, 0.33, 0.33, 0.33], [0.33, 0, 0.33, 0.33], [0.33, 0.33, 0, 0.33], [0.33, 0.33, 0.33, 0]],
-              [[0, 0.33, 0.33, 0.33], [0.33, 0, 0.33, 0.33], [0.33, 0.33, 0, 0.33], [0.33, 0.33, 0.33, 0]]])
-
-# simulation(Q, S, task_ids, T, D, K)
-
 # X stores the distribution of agents across the tasks
-X = LinearOptimiser(Q, S, task_ids, T, D, K)
+X = LinearOptimiser(Q, S, task_ids, T)
 print("Agent distribution: ", X)
 
 T_bar = np.matmul(np.array(X), np.array(Q))
@@ -180,90 +171,6 @@ X_dens = np.matrix.transpose(np.array(X_dens))
 print("Agent density: ")
 print(X_dens)
 
-P = TPMOptimisation(X_dens, Q, S, task_ids, T, D, K)
+P = TPMOptimisation(X_dens, Q, S, task_ids)
 
 simulation(Q, S, task_ids, T, D, P)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# # [START VARIABLES]-----------
-#     # 1. Create a P_bar[i] matrix that is product of I-P[i] and X_dens[i]
-#     P_bar = []
-#     for i in range(len(Q)): #through the species
-#         temp_matrix = []
-#         for j in range(len(task_ids)):
-#             temp_row = []
-#             for k in range(len(task_ids)):
-#                 temp_row.append((solver.NumVar(0, 1, "Pbar_"+str(i)+'_'+str(j)+'_'+str(k))))
-#             temp_matrix.append(temp_row)
-#         P_bar.append(temp_matrix)
-    
-#     print("P_bar: ", P_bar)
-
-#     # 2. Create a P[i] matrix
-#     P = []
-#     for i in range(len(Q)): #through the species
-#         temp_matrix = []
-#         for j in range(len(task_ids)):
-#             temp_row = []
-#             for k in range(len(task_ids)):
-#                 temp_row.append((solver.NumVar(0, 1, 'P_'+str(i)+'_'+str(j)+'_'+str(k))))
-#             temp_matrix.append(temp_row)
-#         P.append(temp_matrix)
-    
-#     print("P: ", P)
-#     # [END VARIABLES]-----------
-
-#     # [START CONSTRAINTS]-----------
-#     # 1. Pi[j] P_bar[j][k] = 0
-#     constraints1=[]
-#     for i in range(len(P_bar)): #through the species
-#         for j in range(len(P_bar[0])):
-#             constraints1.append(solver.Constraint(-solver.infinity(), solver.infinity()))
-#             for k in range(len(P_bar[0][0])):
-#                 constraints1[-1].SetCoefficient(P_bar[i][k][j], X_dens[i][k])
-
-#     # 2. P'[i] = I-P[i]
-#     constraints2=[]
-#     for i in range(len(P_bar)):
-#         for j in range(len(P_bar[0])):
-#             for k in range(len(P_bar[0][0])):
-#                 constraints2.append(solver.Constraint(float(I[j][k]), float(I[j][k])))
-#                 constraints2[-1].SetCoefficient(P_bar[i][j][k], 1)
-#                 constraints2[-1].SetCoefficient(P[i][j][k], 1)
-    
-#     # 3. Row sum of P = 1
-#     constraints3=[]
-#     for i in range(len(P)):
-#         for j in range(len(P[0])): #down the column
-#             constraints3.append(solver.Constraint(1, 1))
-#             for k in range(len(P[0][0])):
-#                 constraints3[-1].SetCoefficient(P[i][j][k], 1)
-    
-#     # 4. diagonal elements in the TPM must be zero (no self loop)
-#     # constraints4=[]
-#     # for i in range(len(P)):
-#     #     for j in range(len(P[0])):
-#     #         constraints4.append(solver.Constraint(0, 0))
-#     #         constraints4[-1].SetCoefficient(P[i][j][j], 1)
-#     # [END CONSTRAINTS]-----------
-
-#     solver.Solve()
-#     for i in range(len(P)):
-#         for j in range(len(P[0])):
-#             for k in range(len(P[0][0])):
-#                 print(P[i][j][k].solution_value(), end=" ")
-#             print()
-#         print()

@@ -37,11 +37,11 @@ class Swarm():
     # compute the transitions from current task to next task based on
     # K matrix and then assign the post-transition states to P
     def computeAndAssignTransitions(self, K):
-        for specie in range(len(self.P)):
-            for agent in range(len(self.P[specie])):
+        for specie in range(len(self.P)): #loop through each specie
+            for agent in range(len(self.P[specie])): #loop through agents of each specie
                 # find which task has been alloted to the agent
                 alloted_task = self.P[specie][agent]
-                # choose a transition out from that task based on K
+                # choose a transition out from current task based on K
                 task_transition_vector = K[specie][alloted_task]
                 transitioned_task = random.choices(self.task_ids, weights=task_transition_vector)
                 self.P[specie][agent] = transitioned_task[0]
