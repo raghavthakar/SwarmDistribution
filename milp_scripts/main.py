@@ -3,7 +3,7 @@ import numpy as np
 import taskgraph
 import swarm
 
-def simulation(Q, S, task_ids, T, D, K):
+def simulation(Q, S, task_ids, T, D, K, num_iters):
     # intiialise a swarm
     main_swarm = swarm.Swarm(Q, S, task_ids)
 
@@ -24,7 +24,6 @@ def simulation(Q, S, task_ids, T, D, K):
     main_swarm.display()
     tg.display()
 
-    num_iters = 750
     for i in range(num_iters):
         # execute one transition iteration and store new allocations
         main_swarm.computeAndAssignTransitions(K)
@@ -39,6 +38,8 @@ def simulation(Q, S, task_ids, T, D, K):
 
     print("Average agent distribution: \n", np.divide(tg.getCumulativeAgentDistribution(), num_iters))
     print("Average trait distribution: \n", np.divide(tg.getCumulativeTraitDistribution(), num_iters))
+
+    return np.divide(tg.getCumulativeAgentDistribution(), num_iters)
 
 # all the linear optimsiation stuff to find feasible linear combinations
 def LinearOptimiser(Q, S, task_ids, T):
@@ -155,7 +156,7 @@ D = np.array([[0, 0, 0],
               S])
 
 # X stores the distribution of agents across the tasks
-X = LinearOptimiser(Q, S, task_ids, T)
+X = np.array(LinearOptimiser(Q, S, task_ids, T))
 print("Agent distribution: ", X)
 
 T_bar = np.matmul(np.array(X), np.array(Q))
@@ -163,14 +164,17 @@ print("Trait distribution: ")
 print(T_bar)
 
 # X_dens stores the fraction of a specie at a task (specie vs task)
-X_dens = X.copy()
-for i in range(len(X)):
-    for j in range(len(X[0])):
-        X_dens[i][j] = X_dens[i][j]/S[j]
+X_dens = X/X.sum(axis=0,keepdims=1)
 X_dens = np.matrix.transpose(np.array(X_dens))
 print("Agent density: ")
 print(X_dens)
 
 P = TPMOptimisation(X_dens, Q, S, task_ids)
 
-simulation(Q, S, task_ids, T, D, P)
+avg_agent_dist = np.array(simulation(Q, S, task_ids, T, D, P, 1000))
+print("Computed X:", X)
+
+error_mat_sq = np.square(avg_agent_dist - X)
+print(error_mat_sq)
+
+print("Error sum:", error_mat_sq.sum())
