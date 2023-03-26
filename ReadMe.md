@@ -41,7 +41,7 @@ We must find a feasible agent distribution matrix across the tasks to satisfy th
 ### Computing the Transition Probability Matrix
 Now that we have the desired distribution of agents across the tasks (steady-state agent distribution), we must compute the Transition Probability Matrix (TPM) that leads the agents to this distribution over time (on average).
 
-We use the relation $\pi$$P_i$$=$$\pi$,
+We use the relation $\pi$ $\times$ $P_i$ $=$ $\pi$,
 where $\pi$ is the steady-state distribution and $P_i$ is the TPM for an $i^{th}$ species.
 
 At steady state, the probability distribution remains unchanged in the Markov chain, even after transitions occur.
